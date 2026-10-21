@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.telemetry.collector.model.hub.*;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
@@ -8,12 +9,10 @@ import java.util.List;
 /**
  * Переводит JSON-модель события хаба в Avro-модель HubEventAvro.
  */
-public final class HubEventMapper {
+@UtilityClass
+public class HubEventMapper {
 
-    private HubEventMapper() {
-    }
-
-    public static HubEventAvro toAvro(HubEvent event) {
+    public HubEventAvro toAvro(HubEvent event) {
         return HubEventAvro.newBuilder()
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
@@ -21,7 +20,7 @@ public final class HubEventMapper {
                 .build();
     }
 
-    private static Object toPayload(HubEvent event) {
+    private Object toPayload(HubEvent event) {
         return switch (event) {
             case DeviceAddedEvent e -> DeviceAddedEventAvro.newBuilder()
                     .setId(e.getId())
@@ -42,7 +41,7 @@ public final class HubEventMapper {
         };
     }
 
-    private static List<ScenarioConditionAvro> toConditions(List<ScenarioCondition> conditions) {
+    private List<ScenarioConditionAvro> toConditions(List<ScenarioCondition> conditions) {
         return conditions.stream()
                 .map(c -> ScenarioConditionAvro.newBuilder()
                         .setSensorId(c.getSensorId())
@@ -53,7 +52,7 @@ public final class HubEventMapper {
                 .toList();
     }
 
-    private static List<DeviceActionAvro> toActions(List<DeviceAction> actions) {
+    private List<DeviceActionAvro> toActions(List<DeviceAction> actions) {
         return actions.stream()
                 .map(a -> DeviceActionAvro.newBuilder()
                         .setSensorId(a.getSensorId())

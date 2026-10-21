@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.telemetry.collector.model.sensor.*;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
@@ -7,12 +8,10 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
  * Переводит JSON-модель события датчика (Java-наследование)
  * в Avro-модель (общая запись + поле payload с union).
  */
-public final class SensorEventMapper {
+@UtilityClass
+public class SensorEventMapper {
 
-    private SensorEventMapper() {
-    }
-
-    public static SensorEventAvro toAvro(SensorEvent event) {
+    public SensorEventAvro toAvro(SensorEvent event) {
         return SensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
@@ -21,7 +20,7 @@ public final class SensorEventMapper {
                 .build();
     }
 
-    private static Object toPayload(SensorEvent event) {
+    private Object toPayload(SensorEvent event) {
         return switch (event) {
             case ClimateSensorEvent e -> ClimateSensorAvro.newBuilder()
                     .setTemperatureC(e.getTemperatureC())
