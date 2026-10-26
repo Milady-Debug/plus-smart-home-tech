@@ -1,0 +1,20 @@
+server:
+  port: 8080   # Hub Router по умолчанию шлёт HTTP-запросы на этот порт
+
+collector:
+  kafka:
+    topics:
+      sensors: telemetry.sensors.v1
+      hubs: telemetry.hubs.v1
+    producer:
+      properties:
+        bootstrap.servers: localhost:9092
+        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.serializer: ru.yandex.practicum.telemetry.collector.kafka.AvroSerializer
+        # быстрее отправлять пачками: подождать до 5 мс и собрать несколько сообщений
+        linger.ms: 5
+        acks: all
+
+logging:
+  level:
+    ru.yandex.practicum.telemetry.collector: DEBUG
