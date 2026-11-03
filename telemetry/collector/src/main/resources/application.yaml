@@ -1,5 +1,6 @@
-server:
-  port: 8080   # Hub Router по умолчанию шлёт HTTP-запросы на этот порт
+grpc:
+  server:
+    port: 59091
 
 collector:
   kafka:
