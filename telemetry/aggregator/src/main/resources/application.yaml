@@ -1,0 +1,25 @@
+aggregator:
+  kafka:
+    topics:
+      sensors: telemetry.sensors.v1
+      snapshots: telemetry.snapshots.v1
+    poll-timeout: 1000ms
+    consumer:
+      properties:
+        bootstrap.servers: localhost:9092
+        group.id: telemetry.aggregator
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value.deserializer: ru.yandex.practicum.kafka.serializer.SensorEventDeserializer
+        # фиксируем оффсеты вручную, после обработки (at-least-once)
+        enable.auto.commit: false
+        # при первом запуске читаем всё, что Collector уже записал
+        auto.offset.reset: earliest
+    producer:
+      properties:
+        bootstrap.servers: localhost:9092
+        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+
+logging:
+  level:
+    ru.yandex.practicum.telemetry.aggregator: DEBUG
