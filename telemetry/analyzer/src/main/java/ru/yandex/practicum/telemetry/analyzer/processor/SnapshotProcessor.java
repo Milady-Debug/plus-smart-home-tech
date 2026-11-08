@@ -17,11 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Цикл опроса топика снапшотов. Работает в основном потоке.
- * Повторная обработка снапшотов нежелательна (действия выполнятся дважды),
- * поэтому оффсет фиксируется вручную сразу после обработки каждого снапшота.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -46,12 +41,17 @@ public class SnapshotProcessor {
                         consumer.poll(kafkaProperties.pollTimeout());
 
                 for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
+                    boolean success = false;
                     try {
                         snapshotAnalyzer.analyze(record.value());
+                        success = true;
                     } catch (Exception e) {
                         log.error("Ошибка при анализе снапшота хаба {}", record.key(), e);
                     }
-                    commitOffset(consumer, record);
+                    // фиксируем оффсет только после успешной обработки,
+                    if (success) {
+                        commitOffset(consumer, record);
+                    }
                 }
             }
 
