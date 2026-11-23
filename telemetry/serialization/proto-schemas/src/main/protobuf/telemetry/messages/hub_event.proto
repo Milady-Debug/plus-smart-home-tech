@@ -84,3 +84,11 @@ message ScenarioAddedEventProto {
 message ScenarioRemovedEventProto {
   string name = 1; // название сценария уникальное в рамках хаба
 }
+
+// запрос на выполнение действия устройством (Analyzer -> Hub Router)
+message DeviceActionRequest {
+  string hub_id = 1;                       // идентификатор хаба
+  string scenario_name = 2;                // название сработавшего сценария
+  DeviceActionProto action = 3;            // действие для устройства
+  google.protobuf.Timestamp timestamp = 4; // время формирования запроса
+}

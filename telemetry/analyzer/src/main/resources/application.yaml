@@ -1,0 +1,51 @@
+analyzer:
+  kafka:
+    topics:
+      hubs: telemetry.hubs.v1
+      snapshots: telemetry.snapshots.v1
+    poll-timeout: 1000ms
+    # консьюмер событий хабов (устройства и сценарии):
+    # поток редкий, повторная обработка не страшна -> автофиксация оффсетов
+    hub-consumer:
+      properties:
+        bootstrap.servers: localhost:9092
+        group.id: telemetry.analyzer.hubs
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value.deserializer: ru.yandex.practicum.kafka.serializer.HubEventDeserializer
+        enable.auto.commit: true
+        auto.commit.interval.ms: 1000
+        auto.offset.reset: earliest
+    # консьюмер снапшотов: повторная обработка нежелательна ->
+    # фиксируем оффсет вручную после каждого обработанного снапшота
+    snapshot-consumer:
+      properties:
+        bootstrap.servers: localhost:9092
+        group.id: telemetry.analyzer.snapshots
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value.deserializer: ru.yandex.practicum.kafka.serializer.SensorsSnapshotDeserializer
+        enable.auto.commit: false
+        auto.offset.reset: earliest
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/telemetry_analyzer
+    username: dbuser
+    password: 12345
+  jpa:
+    hibernate:
+      ddl-auto: none
+  sql:
+    init:
+      mode: always # при старте выполняется schema.sql (CREATE TABLE IF NOT EXISTS ...)
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+logging:
+  level:
+    ru.yandex.practicum.telemetry.analyzer: DEBUG
